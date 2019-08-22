@@ -37,6 +37,7 @@ const List<String> cryptoList = [
   'BTC',
   'ETH',
   'LTC',
+  'ZEC',
 ];
 
 //class CoinData {

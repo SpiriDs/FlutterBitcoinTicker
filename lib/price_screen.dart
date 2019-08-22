@@ -86,14 +86,18 @@ class _PriceScreenState extends State<PriceScreen> {
   String btcValueInCurrency = '?';
   String ethValueInCurrency = '?';
   String ltcValueInCurrency = '?';
+  List coinValues = [];
+
+  bool isWaiting = false;
 
   //11. Create an async method here await the coin data from coin_data.dart
   void getData() async {
-    var test = await CoinData().getCoinData(selectedCurrency);
-    var btc = test[0];
-    print('thisis $btc');
+    isWaiting = true;
     try {
       var data = await CoinData().getCoinData(selectedCurrency);
+      coinValues = data;
+
+      isWaiting = false;
 
       //13. We can't await in a setState(). So you have to separate it out into two steps.
       setState(() {
@@ -104,6 +108,7 @@ class _PriceScreenState extends State<PriceScreen> {
     } catch (e) {
       print(e);
     }
+    print('this coinvalues $coinValues');
   }
 
   @override
@@ -113,11 +118,124 @@ class _PriceScreenState extends State<PriceScreen> {
     getData();
   }
 
-// @override
-// void initState(){
-//   super.initState();
+//! Eigene Loesung. Funktioniert aber die Loesung mit dem neuen Card WIdget ist super!!!!!!!!!
+  // @override
+  // Widget build(BuildContext context) {
+  //   return Scaffold(
+  //     appBar: AppBar(
+  //       title: Text('🤑 Coin Ticker'),
+  //     ),
+  //     body: Column(
+  //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //       crossAxisAlignment: CrossAxisAlignment.stretch,
+  //       children: <Widget>[
+  //         Padding(
+  //           padding: EdgeInsets.fromLTRB(18.0, 18.0, 18.0, 0),
+  //           child: Column(
+  //             crossAxisAlignment: CrossAxisAlignment.stretch,
+  //             children: <Widget>[
+  //               Card(
+  //                 color: Colors.lightBlueAccent,
+  //                 elevation: 5.0,
+  //                 shape: RoundedRectangleBorder(
+  //                   borderRadius: BorderRadius.circular(10.0),
+  //                 ),
+  //                 child: Padding(
+  //                   padding:
+  //                       EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
+  //                   child: Text(
+  //                     //'1 BTC = ? $selectedCurrency',
+  //                     //TODO Loesung ANgela
+  //                     //15. Update the Text Widget with the data in bitcoinValueInUSD.
+  //                     '1 BTC =$btcValueInCurrency $selectedCurrency',
+  //                     textAlign: TextAlign.center,
+  //                     style: TextStyle(
+  //                       fontSize: 20.0,
+  //                       color: Colors.white,
+  //                     ),
+  //                   ),
+  //                 ),
+  //               ),
+  //               Card(
+  //                 color: Colors.lightBlueAccent,
+  //                 elevation: 5.0,
+  //                 shape: RoundedRectangleBorder(
+  //                   borderRadius: BorderRadius.circular(10.0),
+  //                 ),
+  //                 child: Padding(
+  //                   padding:
+  //                       EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
+  //                   child: Text(
+  //                     //'1 BTC = ? $selectedCurrency',
+  //                     //TODO Loesung ANgela
+  //                     //15. Update the Text Widget with the data in bitcoinValueInUSD.
+  //                     '1 ETH = $ethValueInCurrency $selectedCurrency',
+  //                     textAlign: TextAlign.center,
+  //                     style: TextStyle(
+  //                       fontSize: 20.0,
+  //                       color: Colors.white,
+  //                     ),
+  //                   ),
+  //                 ),
+  //               ),
+  //               Card(
+  //                 color: Colors.lightBlueAccent,
+  //                 elevation: 5.0,
+  //                 shape: RoundedRectangleBorder(
+  //                   borderRadius: BorderRadius.circular(10.0),
+  //                 ),
+  //                 child: Padding(
+  //                   padding:
+  //                       EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
+  //                   child: Text(
+  //                     //'1 BTC = ? $selectedCurrency',
+  //                     //TODO Loesung ANgela
+  //                     //15. Update the Text Widget with the data in bitcoinValueInUSD.
+  //                     '1 LTC = $ltcValueInCurrency $selectedCurrency',
+  //                     textAlign: TextAlign.center,
+  //                     style: TextStyle(
+  //                       fontSize: 20.0,
+  //                       color: Colors.white,
+  //                     ),
+  //                   ),
+  //                 ),
+  //               ),
+  //             ],
+  //           ),
+  //         ),
+  //         Container(
+  //           height: 150.0,
+  //           alignment: Alignment.center,
+  //           padding: EdgeInsets.only(bottom: 30.0),
+  //           color: Colors.lightBlue,
+  //           //child: Platform.isIOS ? iOSPicker() : androidDropdown(),    ==> Version ohne getPicker Funktion
+  //           child: getPicker(),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
+//! Erstellen der Cards mit einer for-Schleife, super wichtig, da die Cards so automatisch erweitert werden koennen!!!!!!
+  Column makeCards() {
+    List<CryptoCard> cryptoCards = [];
+    var i = 0;
+    for (String crypto in cryptoList) {
+      cryptoCards.add(
+        CryptoCard(
+          cryptoCurrency: crypto,
+          selectedCurrency: selectedCurrency,
+          value: isWaiting ? '?' : coinValues[i].toStringAsFixed(0),
+        ),
+      );
+      i++;
+    }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: cryptoCards,
+    );
+  }
 
-// }
+  //!Loesung Angela Neues Widget fuer die Cards!!!!!
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -128,89 +246,72 @@ class _PriceScreenState extends State<PriceScreen> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          Padding(
-            padding: EdgeInsets.fromLTRB(18.0, 18.0, 18.0, 0),
-            child: Column(
+          //3: You'll need to use a Column Widget to contain the three CryptoCards.
+          Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
-                Card(
-                  color: Colors.lightBlueAccent,
-                  elevation: 5.0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
-                  child: Padding(
-                    padding:
-                        EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
-                    child: Text(
-                      //'1 BTC = ? $selectedCurrency',
-                      //TODO Loesung ANgela
-                      //15. Update the Text Widget with the data in bitcoinValueInUSD.
-                      '1 BTC = $btcValueInCurrency $selectedCurrency',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 20.0,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                ),
-                Card(
-                  color: Colors.lightBlueAccent,
-                  elevation: 5.0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
-                  child: Padding(
-                    padding:
-                        EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
-                    child: Text(
-                      //'1 BTC = ? $selectedCurrency',
-                      //TODO Loesung ANgela
-                      //15. Update the Text Widget with the data in bitcoinValueInUSD.
-                      '1 ETH = $ethValueInCurrency $selectedCurrency',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 20.0,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                ),
-                Card(
-                  color: Colors.lightBlueAccent,
-                  elevation: 5.0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
-                  child: Padding(
-                    padding:
-                        EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
-                    child: Text(
-                      //'1 BTC = ? $selectedCurrency',
-                      //TODO Loesung ANgela
-                      //15. Update the Text Widget with the data in bitcoinValueInUSD.
-                      '1 LTC = $ltcValueInCurrency $selectedCurrency',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 20.0,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
+                //! Loesung ohne die automatischen Cards
+                // CryptoCard(
+                //   cryptoCurrency: 'BTC',
+                //   value: isWaiting ? '?' : btcValueInCurrency,
+                //   selectedCurrency: selectedCurrency,
+                // ),
+                // CryptoCard(
+                //   cryptoCurrency: 'ETH',
+                //   value: isWaiting ? '?' : ethValueInCurrency,
+                //   selectedCurrency: selectedCurrency,
+                // ),
+                // CryptoCard(
+                //   cryptoCurrency: 'LTC',
+                //   value: isWaiting ? '?' : ltcValueInCurrency,
+                //   selectedCurrency: selectedCurrency,
+                // ),
+
+                //!Erstellen der Cards mit der For Schleife, Super!!!!!!
+                makeCards(),
+              ]),
           Container(
             height: 150.0,
             alignment: Alignment.center,
             padding: EdgeInsets.only(bottom: 30.0),
             color: Colors.lightBlue,
             //child: Platform.isIOS ? iOSPicker() : androidDropdown(),    ==> Version ohne getPicker Funktion
-            child: iOSPicker(),
+            child: getPicker(),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class CryptoCard extends StatelessWidget {
+  const CryptoCard({this.value, this.selectedCurrency, this.cryptoCurrency});
+
+  final String value;
+  final String selectedCurrency;
+  final String cryptoCurrency;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.fromLTRB(18.0, 18.0, 18.0, 0),
+      child: Card(
+        color: Colors.lightBlueAccent,
+        elevation: 5.0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10.0),
+        ),
+        child: Padding(
+          padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
+          child: Text(
+            '1 $cryptoCurrency = $value $selectedCurrency',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 20.0,
+              color: Colors.white,
+            ),
+          ),
+        ),
       ),
     );
   }
