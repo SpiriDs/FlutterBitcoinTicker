@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'coin_data.dart';
 import 'package:flutter/cupertino.dart';
 import 'dart:io' show Platform;
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 class PriceScreen extends StatefulWidget {
   @override
@@ -62,7 +63,7 @@ class _PriceScreenState extends State<PriceScreen> {
           selectedCurrency = currenciesList[
               selectedIndex]; //! Wichtig beim Cupertino PIcker ist, dass man um an den Wert zu bekommen auf die urspruengliche Liste mit dem selectedIndex auf der jeweiligen Position zurueckgreift!
 
-          getData(); //!getData() muss in der setSate() aufgerufen werden, da davor die Waehrung geandert wird!! Der Fehler war bei mir, dass ich e
+          getData(); //!getData() muss in der setSate() aufgerufen werden, da davor die Waehrung geandert wird!! Der Fehler war bei mir, dass ich es ausserhalb des setStates() hatte.
         });
       },
       children: pickerItems,
@@ -82,15 +83,23 @@ class _PriceScreenState extends State<PriceScreen> {
 
   //TODO Loesung von Angela untersuchen warum es bei mir nicht funktioniert hat!!!!!!!!!
   //12. Create a variable to hold the value and use in our Text Widget. Give the variable a starting value of '?' before the data comes back from the async methods.
-  String bitcoinValueInUSD = '?';
+  String btcValueInCurrency = '?';
+  String ethValueInCurrency = '?';
+  String ltcValueInCurrency = '?';
 
   //11. Create an async method here await the coin data from coin_data.dart
   void getData() async {
+    var test = await CoinData().getCoinData(selectedCurrency);
+    var btc = test[0];
+    print('thisis $btc');
     try {
-      double data = await CoinData().getCoinData(selectedCurrency);
+      var data = await CoinData().getCoinData(selectedCurrency);
+
       //13. We can't await in a setState(). So you have to separate it out into two steps.
       setState(() {
-        bitcoinValueInUSD = data.toStringAsFixed(0);
+        btcValueInCurrency = data[0].toStringAsFixed(0);
+        ethValueInCurrency = data[1].toStringAsFixed(0);
+        ltcValueInCurrency = data[2].toStringAsFixed(0);
       });
     } catch (e) {
       print(e);
@@ -121,26 +130,76 @@ class _PriceScreenState extends State<PriceScreen> {
         children: <Widget>[
           Padding(
             padding: EdgeInsets.fromLTRB(18.0, 18.0, 18.0, 0),
-            child: Card(
-              color: Colors.lightBlueAccent,
-              elevation: 5.0,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10.0),
-              ),
-              child: Padding(
-                padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
-                child: Text(
-                  //'1 BTC = ? $selectedCurrency',
-                  //TODO Loesung ANgela
-                  //15. Update the Text Widget with the data in bitcoinValueInUSD.
-                  '1 BTC = $bitcoinValueInUSD $selectedCurrency',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 20.0,
-                    color: Colors.white,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: <Widget>[
+                Card(
+                  color: Colors.lightBlueAccent,
+                  elevation: 5.0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                  child: Padding(
+                    padding:
+                        EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
+                    child: Text(
+                      //'1 BTC = ? $selectedCurrency',
+                      //TODO Loesung ANgela
+                      //15. Update the Text Widget with the data in bitcoinValueInUSD.
+                      '1 BTC = $btcValueInCurrency $selectedCurrency',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 20.0,
+                        color: Colors.white,
+                      ),
+                    ),
                   ),
                 ),
-              ),
+                Card(
+                  color: Colors.lightBlueAccent,
+                  elevation: 5.0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                  child: Padding(
+                    padding:
+                        EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
+                    child: Text(
+                      //'1 BTC = ? $selectedCurrency',
+                      //TODO Loesung ANgela
+                      //15. Update the Text Widget with the data in bitcoinValueInUSD.
+                      '1 ETH = $ethValueInCurrency $selectedCurrency',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 20.0,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+                Card(
+                  color: Colors.lightBlueAccent,
+                  elevation: 5.0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                  child: Padding(
+                    padding:
+                        EdgeInsets.symmetric(vertical: 15.0, horizontal: 28.0),
+                    child: Text(
+                      //'1 BTC = ? $selectedCurrency',
+                      //TODO Loesung ANgela
+                      //15. Update the Text Widget with the data in bitcoinValueInUSD.
+                      '1 LTC = $ltcValueInCurrency $selectedCurrency',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 20.0,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
           Container(
